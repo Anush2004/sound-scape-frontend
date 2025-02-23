@@ -58,4 +58,3 @@ Welcome to the **sound-scape-frontend** repository. This project includes two ma
 
 ---
 
-Feel free to update this README as the project evolves. Enjoy coding!
