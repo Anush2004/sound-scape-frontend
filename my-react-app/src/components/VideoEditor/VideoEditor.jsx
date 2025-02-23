@@ -142,7 +142,10 @@ const VideoEditor = () => {
       <div className="flex-1 flex flex-col">
         <div className="flex flex-1">
           <div className="w-1/2 p-4 border-r border-gray-700">
-            <ThreeDRenderer />
+            <ThreeDRenderer 
+                isPlaying={isPlaying}
+                currentTime={currentTime}
+              />
           </div>
           <div className="w-1/2 p-4">
             <VideoPlayback 
