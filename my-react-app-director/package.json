@@ -13,6 +13,7 @@
     "@react-three/drei": "^10.0.0",
     "@react-three/fiber": "^9.0.4",
     "@tailwindcss/vite": "^4.0.8",
+    "lucide-react": "^0.475.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind": "^4.0.0",

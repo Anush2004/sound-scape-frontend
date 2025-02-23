@@ -1,10 +1,53 @@
-// import React, { useEffect } from 'react';
+// import React, { useEffect, useState } from 'react';
 // import { Canvas, useThree } from "@react-three/fiber";
 // import { OrbitControls } from "@react-three/drei";
-// import { useState } from "react";
 // import * as THREE from "three";
 
-// const Scene = ({ spheres, setSpheres, selectedSphere, setSelectedSphere, removeSphere, isRendering }) => {
+// const CommentDialog = ({ isOpen, onClose, onSubmit }) => {
+//   const [comment, setComment] = useState('');
+
+//   if (!isOpen) return null;
+
+//   const handleSubmit = () => {
+//     onSubmit(comment);
+//     setComment('');
+//     onClose();
+//   };
+
+//   return (
+//     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+//       <div className="bg-gray-800 text-white p-6 rounded-lg w-96">
+//         <div className="flex justify-between items-center mb-4">
+//           <h2 className="text-xl font-semibold">Add Comment</h2>
+//           <button 
+//             onClick={onClose}
+//             className="text-gray-400 hover:text-white"
+//           >
+//             ×
+//           </button>
+//         </div>
+//         <div className="mt-4">
+//           <textarea
+//             value={comment}
+//             onChange={(e) => setComment(e.target.value)}
+//             className="w-full h-32 p-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+//             placeholder="Enter your comment here..."
+//           />
+//           <div className="mt-4 flex justify-end">
+//             <button
+//               onClick={handleSubmit}
+//               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+//             >
+//               Add Comment
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// const Scene = ({ spheres, setSpheres, selectedSphere, setSelectedSphere, removeSphere }) => {
 //   const { camera } = useThree();
 //   const cubeSize = 10;
 
@@ -18,7 +61,6 @@
 //   };
 
 //   const handleClick = (e, id) => {
-//     if (!isRendering) return;
 //     e.stopPropagation();
 //     setSelectedSphere(id === selectedSphere ? null : id);
 //   };
@@ -27,7 +69,7 @@
 //     const moveSpeed = 0.2;
 
 //     const handleKeyDown = (e) => {
-//       if (selectedSphere === null || !isRendering) return;
+//       if (selectedSphere === null) return;
 
 //       setSpheres(prevSpheres => {
 //         const sphereIndex = prevSpheres.findIndex(s => s.id === selectedSphere);
@@ -93,7 +135,7 @@
 
 //     window.addEventListener('keydown', handleKeyDown);
 //     return () => window.removeEventListener('keydown', handleKeyDown);
-//   }, [selectedSphere, setSpheres, camera.quaternion, removeSphere, isRendering]);
+//   }, [selectedSphere, setSpheres, camera.quaternion, removeSphere]);
 
 //   return (
 //     <>
@@ -102,7 +144,6 @@
 //       <ambientLight intensity={0.5} />
 //       <pointLight position={[0, 0, 0]} intensity={0.8} />
 
-//       {/* Main cube with gradient material */}
 //       <mesh position={[0, 0, 0]}>
 //         <boxGeometry args={[cubeSize, cubeSize, cubeSize]} />
 //         <meshPhysicalMaterial
@@ -118,7 +159,6 @@
 //         />
 //       </mesh>
 
-//       {/* Blue edge lines */}
 //       <lineSegments>
 //         <edgesGeometry args={[new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize)]} />
 //         <lineBasicMaterial color="#304050" />
@@ -128,7 +168,7 @@
 //         <group key={sphere.id}>
 //           <mesh
 //             position={sphere.position}
-//             // onClick={(e) => handleClick(e, sphere.id)}
+//             onClick={(e) => handleClick(e, sphere.id)}
 //           >
 //             <sphereGeometry args={[0.2, 32, 32]} />
 //             <meshBasicMaterial
@@ -143,6 +183,12 @@
 //               opacity={0.2}
 //             />
 //           </mesh>
+//           {sphere.comment && (
+//             <mesh position={[sphere.position[0], sphere.position[1] + 0.5, sphere.position[2]]}>
+//               <sphereGeometry args={[0.1, 16, 16]} />
+//               <meshBasicMaterial color="#ffffff" />
+//             </mesh>
+//           )}
 //         </group>
 //       ))}
 //     </>
@@ -152,11 +198,9 @@
 // const ThreeDRenderer = () => {
 //   const [spheres, setSpheres] = useState([]);
 //   const [selectedSphere, setSelectedSphere] = useState(null);
-//   const [isRendering, setIsRendering] = useState(false);
+//   const [isCommentDialogOpen, setIsCommentDialogOpen] = useState(false);
 
 //   const addSphere = () => {
-//     if (!isRendering) return;
-    
 //     const cubeSize = 10;
 //     const halfSize = cubeSize / 2;
 //     const newSphere = {
@@ -175,45 +219,43 @@
 //     setSelectedSphere(null);
 //   };
 
-//   const handleRender = () => {
-//     setIsRendering(!isRendering);
-//     if (!isRendering) {
-//       setSpheres([]);
-//       setSelectedSphere(null);
-//     }
+//   const handleAddComment = (comment) => {
+//     if (selectedSphere === null) return;
+    
+//     setSpheres(prevSpheres => prevSpheres.map(sphere => 
+//       sphere.id === selectedSphere 
+//         ? { ...sphere, comment } 
+//         : sphere
+//     ));
 //   };
 
 //   return (
 //     <div className="bg-gray-900 h-full rounded-lg p-4">
 //       <div className="flex justify-between items-center mb-4">
 //         <h2 className="text-lg font-semibold text-white">3D Audio Visualizer</h2>
-//         <button 
-//           onClick={handleRender}
-//           className={`px-4 py-2 rounded-md text-white font-medium transition-colors ${
-//             isRendering 
-//               ? "bg-red-600 hover:bg-red-700" 
-//               : "bg-green-600 hover:bg-green-700"
-//           }`}
-//           disabled={true}
-//         >
-//           {isRendering ? "Stop Rendering" : "Start Rendering"}
-//         </button>
 //       </div>
 
 //       <div className="flex gap-2 mb-4">
 //         <button
 //           onClick={addSphere}
-//           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+//           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
 //           disabled={true}
 //         >
 //           Add Sphere
 //         </button>
 //         <button
 //           onClick={() => selectedSphere !== null && removeSphere(selectedSphere)}
-//           className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+//           className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
 //           disabled={true}
 //         >
 //           Remove Selected
+//         </button>
+//         <button
+//           onClick={() => setIsCommentDialogOpen(true)}
+//           className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50"
+//           // disabled={selectedSphere === null}
+//         >
+//           Add Comment
 //         </button>
 //       </div>
 
@@ -226,10 +268,15 @@
 //             selectedSphere={selectedSphere}
 //             setSelectedSphere={setSelectedSphere}
 //             removeSphere={removeSphere}
-//             isRendering={isRendering}
 //           />
 //         </Canvas>
 //       </div>
+
+//       <CommentDialog
+//         isOpen={isCommentDialogOpen}
+//         onClose={() => setIsCommentDialogOpen(false)}
+//         onSubmit={handleAddComment}
+//       />
 //     </div>
 //   );
 // };
@@ -241,45 +288,74 @@ import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 
-const CommentDialog = ({ isOpen, onClose, onSubmit }) => {
-  const [comment, setComment] = useState('');
+const CommentDialog = ({ isOpen, onClose, comments, onAddComment, onDeleteComment }) => {
+  const [newComment, setNewComment] = useState('');
 
   if (!isOpen) return null;
 
-  const handleSubmit = () => {
-    onSubmit(comment);
-    setComment('');
-    onClose();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+    
+    onAddComment({
+      id: Date.now(),
+      text: newComment,
+      timestamp: new Date().toLocaleString()
+    });
+    setNewComment('');
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-gray-800 text-white p-6 rounded-lg w-96">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Add Comment</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-gray-800 text-white p-6 rounded-lg w-[600px] max-h-[80vh] flex flex-col">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold">Discussion</h2>
           <button 
             onClick={onClose}
-            className="text-gray-400 hover:text-white"
+            className="text-gray-400 hover:text-white text-2xl"
           >
             ×
           </button>
         </div>
-        <div className="mt-4">
+
+        <div className="flex-1 overflow-y-auto my-6 space-y-4 min-h-[300px] max-h-[500px]">
+          {comments.map((comment) => (
+            <div key={comment.id} className="bg-gray-700 p-3 rounded-lg">
+              <div className="flex justify-between items-start">
+                <span className="text-sm text-gray-400">{comment.timestamp}</span>
+                <button
+                  onClick={() => onDeleteComment(comment.id)}
+                  className="text-red-400 hover:text-red-300"
+                >
+                  Delete
+                </button>
+              </div>
+              <p className="mt-2 whitespace-pre-wrap">{comment.text}</p>
+            </div>
+          ))}
+          {comments.length === 0 && (
+            <div className="text-gray-400 text-center pt-4">
+              No comments yet. Start the discussion!
+            </div>
+          )}
+        </div>
+
+        <form onSubmit={handleSubmit} className="mt-auto">
           <textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
             className="w-full h-32 p-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter your comment here..."
+            placeholder="Add to the discussion..."
           />
           <div className="mt-4 flex justify-end">
             <button
-              onClick={handleSubmit}
+              type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
             >
-              Add Comment
+              Post Comment
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );
@@ -421,12 +497,6 @@ const Scene = ({ spheres, setSpheres, selectedSphere, setSelectedSphere, removeS
               opacity={0.2}
             />
           </mesh>
-          {sphere.comment && (
-            <mesh position={[sphere.position[0], sphere.position[1] + 0.5, sphere.position[2]]}>
-              <sphereGeometry args={[0.1, 16, 16]} />
-              <meshBasicMaterial color="#ffffff" />
-            </mesh>
-          )}
         </group>
       ))}
     </>
@@ -436,6 +506,7 @@ const Scene = ({ spheres, setSpheres, selectedSphere, setSelectedSphere, removeS
 const ThreeDRenderer = () => {
   const [spheres, setSpheres] = useState([]);
   const [selectedSphere, setSelectedSphere] = useState(null);
+  const [comments, setComments] = useState([]);
   const [isCommentDialogOpen, setIsCommentDialogOpen] = useState(false);
 
   const addSphere = () => {
@@ -447,7 +518,7 @@ const ThreeDRenderer = () => {
         Math.random() * (cubeSize - 0.6) - halfSize + 0.3,
         Math.random() * (cubeSize - 0.6) - halfSize + 0.3,
         Math.random() * (cubeSize - 0.6) - halfSize + 0.3,
-      ],
+      ]
     };
     setSpheres([...spheres, newSphere]);
   };
@@ -458,41 +529,39 @@ const ThreeDRenderer = () => {
   };
 
   const handleAddComment = (comment) => {
-    if (selectedSphere === null) return;
-    
-    setSpheres(prevSpheres => prevSpheres.map(sphere => 
-      sphere.id === selectedSphere 
-        ? { ...sphere, comment } 
-        : sphere
-    ));
+    setComments(prevComments => [...prevComments, comment]);
+  };
+
+  const handleDeleteComment = (commentId) => {
+    setComments(prevComments => prevComments.filter(comment => comment.id !== commentId));
   };
 
   return (
     <div className="bg-gray-900 h-full rounded-lg p-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-white">3D Audio Visualizer</h2>
+        <button
+          onClick={() => setIsCommentDialogOpen(true)}
+          className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+        >
+          Open Discussion
+        </button>
       </div>
 
       <div className="flex gap-2 mb-4">
         <button
           onClick={addSphere}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+          disabled={true}
         >
           Add Sphere
         </button>
         <button
           onClick={() => selectedSphere !== null && removeSphere(selectedSphere)}
           className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
-          disabled={selectedSphere === null}
+          disabled={true}
         >
           Remove Selected
-        </button>
-        <button
-          onClick={() => setIsCommentDialogOpen(true)}
-          className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50"
-          disabled={selectedSphere === null}
-        >
-          Add Comment
         </button>
       </div>
 
@@ -512,7 +581,9 @@ const ThreeDRenderer = () => {
       <CommentDialog
         isOpen={isCommentDialogOpen}
         onClose={() => setIsCommentDialogOpen(false)}
-        onSubmit={handleAddComment}
+        comments={comments}
+        onAddComment={handleAddComment}
+        onDeleteComment={handleDeleteComment}
       />
     </div>
   );
