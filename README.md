@@ -52,6 +52,7 @@ Welcome to the **sound-scape-frontend** repository. This project includes two ma
 
 - **Documents:**  
   The `documents` folder includes key project files such as final wireframes and the main explanation video, providing insights into the UI design and development process.
+  Main Video - https://iiithydstudents-my.sharepoint.com/:v:/g/personal/anush_anand_students_iiit_ac_in/EfkJYmFyYFVLqrPezzGRLzABdTrVCyupyDZqfMDaLrDkBw?e=veuSES&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D
 
 - **Videos:**  
   The `videos` folder contains sample videos used during the development phase, which can be referenced for testing and further enhancement of the UI.
